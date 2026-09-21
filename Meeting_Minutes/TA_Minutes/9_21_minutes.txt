@@ -1,0 +1,42 @@
+TA meetings are a mix of standups and sprints
+  - first 15 minutes check on tasks everyone shares what they've been doing for last week, what you plan to do next week, what went well, and blockers, what didn't go well, and what could be improved
+Grading
+  - everyone starts at an assumed full score
+  - slowly deduct if need be
+To achieve full score 
+  - maintain good communication with team, sponsors(no more than 1-day turnaround time for messaging)
+  - consistent effort(2 hours outside meetings)
+  - conflict resolution 
+How progress will be checked
+  - progress on weekly tasks will be tracked
+  - emphasis on sustained participation and progress
+How does this affect grades
+  - if expectations are not met
+    1. a warning may be given
+    2. continued failure leads to grade deduction
+TA involvement
+  - tasking weekly and long-term goals
+  - grading us throughout the project
+  - provide technical suggestions and planning help
+For next week agree on tools
+  - kanban of some sort
+  - agree on development tools(repo, CI/CD runners)
+  - everyone validate the workflow
+AI for development
+  - ask sponsor if we can use
+  - ask if they have an internal model we can use
+  - We are responsible for what comes out of the AI
+
+Q What AI models?
+A We have 2 aspects, development and application. "Its a digital twin or am I tripping"
+... create synthetic data and accept multiple types of formats so we don't have to wait 
+... in terms of development needs use gpt and we can figure out the other stuff later
+
+Research how we can link your editor to your dev container
+
+Q How involved is the TA technically?
+A as much as needed without stepping on the sponsors toes, only involved in the meetings, not looking at our code or anything
+
+Next time:
+ - have our 15 minute updates
+ - get a bit technical and start planning
