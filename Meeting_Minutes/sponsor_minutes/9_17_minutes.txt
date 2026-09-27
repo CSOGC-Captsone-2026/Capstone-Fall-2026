@@ -1,0 +1,44 @@
+Project sponsor notes:
+Barbara is the state director for nasa thing, she teaches in the aero department
+Mark is research manager, coadvising two of the electric capstone projects
+Statewide program based out of CU, funded by NASA, able to run programs for undergrads, making sure they support hands on opportunities for undergrads
+Big new area they are diving into is analog astronaut training and missions
+As nasa prepares for more long term missions, sending to moon for longer, transit to mars, have to understand how space not just affects humans but also how physical environment affects humans while doing missions tasks
+One way to test is here on earth in analog tests
+Mark did two week analog mission in Brazil
+We need to understand what the analog astronauts experience while doing missions
+That is why we are developing a digital twin for analog astronaut
+Two electrical teams designing two sets of sensors to be inside of the suit, so data will be generated
+Env inside the suit, and biometrics of user
+They would like to feed the data into the digital twin so it can mimic what is happening with the astronauts, then predict trends, predict failure points
+We will have potentially real data to work with and train system on, so we don’t have to worry what that data is, the other two teams will do that
+Hoping that means we can meet with the other two capstone teams and have interaction with them to better understand the design we are co creating
+That’s the big picture, questions
+Q: Digital twin: does it mimic astronaut or the environment they’re in
+A: There’s flexibility, the sensors to be designed are focused on the suit environment: if we can model that, that would be fabulous. If we can model where the suit is that would be cooler but also just a bigger task in general. The eventual goal is to build a system that can model both astronaut and habitat. Don’t have habitat, hopefully Mars Desert Research Station
+Q: sensors: for those measuring biometrics, what does it entail? As the project develops, we meet with other groups to learn how to interface?
+A: heartrate, body temp, respiration rate, etc. Yes
+Q: realtime data handling?
+A: have to start training model based off data, but ideal to get to point where ready to deal with real time live feed
+Q: prior frameworks or existing work?
+A: no, we are the first group to work on this
+Her ideal for expo is the other two teams are running the sensors and our team is interpreting that data real time
+Q: best time to meet?
+A: have this (5PM Thursday) be the assumed meeting time, and if we need to rediscuss we can, she wants to meet weekly while we are getting established so we can address questions frequently, so she can understand our deliverables for the capstone class 
+Q: for capstone, we decide our own roles, do they add input
+A: within our groups, we will understand what our sponsors need in terms of roles, we will go off technical understanding for the future 
+One of the teams is asking for contact information from us
+Alexander 858-267-8765 cell Environmental Sensor Capstone contact requesting some details around Digital Twin approach. Project description access requested. Also, their PM’s email: Eugenio.BaezaDelascasas@colorado.edu
+Q: preferred communication with the PMs
+A: Slack, send calendar invites through Outlook mainly
+Q: should we have a Slack that has all teams for this project
+A: yes
+Right now the environmental capstone team meets with them on Thursdays at 2, the biomedical sensor team meets with them on Friday at 4
+Some of the people from the teams can join the other meetings if need be
+Q: pertaining to technical details, why do we want a digital twin instead of a more basic AI model? Is the twin trying to have the model be specific to each astronaut?
+A: short answer, yes. They would like the twin to be able to look for failure before it happens for each astronaut. If we want to start out with a basic model to see how to handle certain data streams with certain info, we can. We have freedom to approach the development, but doing it knowing the end goal
+Idea: general AI model that can further adapt based on individual astronaut data
+Once we have the data and train the model and prompt it accordingly, it won’t be too difficult to tailor it to each person
+There are papers about NASA’s work with digital twins already if we want to take a look (we do)
+The CS faculty believed there to be sufficient resources for the model training we need
+Primary goal will be to find common ground with all the teams and build that scope and then evolve it out
