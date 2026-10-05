@@ -1,0 +1,51 @@
+Sponsor Meeting Notes:
+
+Start: 5:00 PM
+
+Project Group Attendees: 
+Isaac
+Gavin
+Kevin
+Josh
+Cody
+Aleqzander
+
+Sponsor Attendees:
+Barbara, Mark 
+
+We gave a quick overview of our progress so far, mainly focused on research and initial creation of synthetic data
+
+Next, we went over the project charter with the sponsors, going through each section and getting feedback/approval
+She didn't see anything that raised a question and Mark mentioned getting the data in time to do what they need to do
+They approved of the charter and we will send it to them to sign via DocuSign
+
+
+Q: In terms of response time, do we have a minimum time for detection
+A: it will depend on the anomoly, some will present quick and some may be slow
+Will depend on how often we are getting data from the sensors as well
+Once we know sampling rates, then we will know more about the data input
+Each sensor will have a different sampling rate, but must know how the data is getting parsed into packets
+There will be some manuvering to figure out the best way to handle incoming data
+This is another reason communication with the other teams will be very important
+There will be an online database we can pull from
+Realtime warnings/errors: balance between complexity & accuracy vs response time and efficiency
+We can have a faster model run real time and a more in depth one that doesn't run in real time for larger analysis
+We probably don't need a frontier model with APIs, we can run a local model
+
+Q: What are we using the data to detect?
+A: Air quality: if we begin to see deviations from air quality from the nominal data, the digital twin should be able to see the differences much sooner than the astronaut
+In theory the model should see deviations in the data given before critical problems develop
+Likewise, having a digital twin trained on lots of data allows for simulations to be ran to see where things can break
+
+Q: Previously, there were a lot of analog astronaut runs, so is the data all gathered by sensors, or will we also incorporate previous data?
+A: Data gathered by other teams, but they can look into getting some of the previous data to work with
+The only people who have done what we are doing is NASA, so they will try to get previous sources but they won't be the exact same data as what we are doing
+
+Q: Would having multiple models work together be acceptable?
+A: If that reaches the end goal then yes
+
+Q: We are attempting to use free/opensource models. If there somehow becomes a need to spend money, is there a plan for that?
+A: They have some budget, we would just need to bring a proposal
+
+
+End: 5:26PM
