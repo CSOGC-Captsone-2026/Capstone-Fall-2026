@@ -1,0 +1,182 @@
+{
+  "_note": "Sensor list from the COSGC Environmental and Biometric Suit Sensor project descriptions (rev 2025-05-16). Units, rates, ranges and critical limits are PLACEHOLDERS until the sensor teams pick hardware and COSGC confirms safety limits.",
+
+  "sensors": {
+
+    "o2": {
+      "source": "environmental", "optional": false, "enabled": true,
+      "note": "Unpressurized suit assumed, so % by volume. A pressurized suit would report partial pressure (kPa) instead.",
+      "unit": "%", "rate_hz": 1,
+      "normal": [20.6, 20.95], "limits": [0, 100],
+      "critical": {"low": 19.5},
+      "activity_effect": 0.985, "response_s": 120,
+      "noise": 0.04, "drift_per_min": -0.004,
+      "spike_delta": 1.5,
+      "anomalies": ["ramp", "spike", "stuck", "dropout"]
+    },
+    "co2": {
+      "source": "environmental", "optional": false, "enabled": true,
+      "note": "Exhaled CO2 build-up; checks the scrubber / ventilation and guards against hypercapnia.",
+      "unit": "ppm", "rate_hz": 1,
+      "normal": [600, 1200], "limits": [0, 50000],
+      "critical": {"high": 5000},
+      "activity_effect": 1.8, "response_s": 120,
+      "noise": 25, "drift_per_min": 3,
+      "spike_delta": 2000,
+      "anomalies": ["ramp", "spike", "stuck", "dropout", "contextual"]
+    },
+    "suit_air_temp": {
+      "source": "environmental", "optional": false, "enabled": true,
+      "note": "Ambient air temperature inside the suit / helmet.",
+      "unit": "C", "rate_hz": 0.2,
+      "normal": [21, 25], "limits": [-40, 85],
+      "critical": {"high": 35},
+      "activity_effect": 1.12, "response_s": 300,
+      "noise": 0.15, "drift_per_min": 0.03,
+      "spike_delta": 6,
+      "anomalies": ["ramp", "stuck", "dropout"]
+    },
+    "vent_loop_temp": {
+      "source": "environmental", "optional": false, "enabled": true,
+      "note": "Equipment / ventilation loop temperature.",
+      "unit": "C", "rate_hz": 0.2,
+      "normal": [18, 22], "limits": [-40, 85],
+      "critical": {"high": 30},
+      "activity_effect": 1.05, "response_s": 300,
+      "noise": 0.1, "drift_per_min": 0.01,
+      "spike_delta": 5,
+      "anomalies": ["ramp", "stuck", "dropout"]
+    },
+    "humidity": {
+      "source": "environmental", "optional": false, "enabled": true,
+      "note": "Relative humidity; high values mean condensation and visor fogging.",
+      "unit": "%RH", "rate_hz": 0.2,
+      "normal": [35, 50], "limits": [0, 100],
+      "critical": {"high": 85},
+      "activity_effect": 1.35, "response_s": 300,
+      "noise": 0.8, "drift_per_min": 0.1,
+      "spike_delta": 20,
+      "anomalies": ["ramp", "stuck", "dropout"]
+    },
+    "pm2_5": {
+      "source": "environmental", "optional": true, "enabled": true,
+      "note": "Particulates (listed as a bonus). A spike stands in for a dust breach of the life-support loop.",
+      "unit": "ug/m3", "rate_hz": 0.5,
+      "normal": [2, 8], "limits": [0, 1000],
+      "critical": {"high": 35},
+      "activity_effect": 1.5, "response_s": 30,
+      "noise": 0.8, "drift_per_min": 0,
+      "spike_delta": 60,
+      "anomalies": ["spike", "stuck", "dropout"]
+    },
+    "suit_pressure": {
+      "source": "environmental", "optional": true, "enabled": false,
+      "note": "Only for pressurized suits (~4.3 psi for NASA EVA suits). Disabled because most analog suits are unpressurized.",
+      "unit": "psi", "rate_hz": 1,
+      "normal": [4.25, 4.35], "limits": [0, 20],
+      "critical": {"low": 3.8},
+      "activity_effect": 1.0, "response_s": 10,
+      "noise": 0.01, "drift_per_min": 0,
+      "spike_delta": 0.6,
+      "anomalies": ["ramp", "spike", "stuck", "dropout"]
+    },
+
+    "heart_rate": {
+      "source": "biometric", "optional": false, "enabled": true,
+      "unit": "bpm", "rate_hz": 1,
+      "normal": [60, 85], "limits": [20, 250],
+      "critical": {"high": 170},
+      "activity_effect": 1.6, "response_s": 45,
+      "noise": 2.0, "drift_per_min": 0.05,
+      "spike_delta": 45,
+      "anomalies": ["ramp", "spike", "dropout", "contextual"]
+    },
+    "respiration_rate": {
+      "source": "biometric", "optional": false, "enabled": true,
+      "unit": "breaths/min", "rate_hz": 0.5,
+      "normal": [12, 18], "limits": [0, 80],
+      "critical": {"high": 35},
+      "activity_effect": 1.9, "response_s": 30,
+      "noise": 0.8, "drift_per_min": 0.02,
+      "spike_delta": 12,
+      "anomalies": ["ramp", "spike", "dropout", "contextual"]
+    },
+    "core_temp": {
+      "source": "biometric", "optional": false, "enabled": true,
+      "note": "Responds slowly to exertion (many minutes), unlike heart rate.",
+      "unit": "C", "rate_hz": 0.1,
+      "normal": [36.8, 37.2], "limits": [30, 44],
+      "critical": {"high": 38.5},
+      "activity_effect": 1.022, "response_s": 900,
+      "noise": 0.03, "drift_per_min": 0.002,
+      "spike_delta": 1.0,
+      "anomalies": ["ramp", "stuck", "dropout"]
+    },
+    "skin_temp": {
+      "source": "biometric", "optional": false, "enabled": true,
+      "unit": "C", "rate_hz": 0.2,
+      "normal": [32.5, 34.0], "limits": [20, 45],
+      "critical": {"high": 37},
+      "activity_effect": 1.04, "response_s": 240,
+      "noise": 0.08, "drift_per_min": 0.005,
+      "spike_delta": 2.5,
+      "anomalies": ["ramp", "stuck", "dropout"]
+    },
+    "perspiration": {
+      "source": "biometric", "optional": false, "enabled": true,
+      "note": "Modeled as electrodermal activity (skin conductance). The 'critical' value is a placeholder marker for heavy sweating, not a medical limit.",
+      "unit": "uS", "rate_hz": 1,
+      "normal": [2, 8], "limits": [0, 100],
+      "critical": {"high": 30},
+      "activity_effect": 2.5, "response_s": 120,
+      "noise": 0.3, "drift_per_min": 0.02,
+      "spike_delta": 15,
+      "anomalies": ["spike", "stuck", "dropout", "contextual"]
+    },
+    "hydration_loss": {
+      "source": "biometric", "optional": false, "enabled": true,
+      "note": "Estimated fluid loss as % of body mass. Accumulates with exertion and does not recover during rest. How the team will actually measure hydration is still open.",
+      "unit": "% body mass", "rate_hz": 0.0167,
+      "normal": [0, 0.1], "limits": [0, 10],
+      "critical": {"high": 2.0},
+      "activity_effect": 1.0, "accumulate_per_min": 0.025, "response_s": 60,
+      "noise": 0.02, "drift_per_min": 0,
+      "spike_delta": 0.5,
+      "anomalies": ["ramp", "stuck", "dropout"]
+    },
+    "spo2": {
+      "source": "biometric", "optional": true, "enabled": true,
+      "note": "Listed as a possible measurement, not a requirement.",
+      "unit": "%", "rate_hz": 1,
+      "normal": [96, 99], "limits": [50, 100],
+      "critical": {"low": 92},
+      "activity_effect": 0.995, "response_s": 60,
+      "noise": 0.4, "drift_per_min": 0,
+      "spike_delta": 6,
+      "anomalies": ["ramp", "spike", "dropout"]
+    }
+  },
+
+  "session": {
+    "phases": [
+      {"name": "rest",     "minutes": 10, "activity": 0.0},
+      {"name": "eva_task", "minutes": 30, "activity": 1.0},
+      {"name": "rest",     "minutes": 5,  "activity": 0.0},
+      {"name": "eva_task", "minutes": 25, "activity": 0.8},
+      {"name": "cooldown", "minutes": 10, "activity": 0.2}
+    ],
+    "gap_between_sessions_min": 60
+  },
+
+  "anomalies": {
+    "per_session": 3,
+    "duration_min": {
+      "ramp":       [6, 12],
+      "spike":      [1, 3],
+      "stuck":      [3, 8],
+      "dropout":    [1, 4],
+      "contextual": [2, 4]
+    },
+    "ramp_overshoot": 1.15
+  }
+}
