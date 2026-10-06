@@ -1,0 +1,17 @@
+Attendance:
+Isaac Camacho
+Cody Mattox
+Gavin Petruzzi
+Kevin Wang
+Josh Wright
+Aleqzander Baker
+
+Main Points:
+- Think of clarifying questions for sponsor to get better scope
+- Think of additional milestones to add to the project
+- communicate with other CSOGC teams for a better understanding of data warehousing
+
+Moving Forward:
+- create database for data warehousing
+- create clarifying document with specific questions for sponsor
+- begin looking at prediction algorithms/large langauge models for simulations
