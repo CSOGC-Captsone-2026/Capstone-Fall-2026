@@ -1,0 +1,31 @@
+Sponsor Meeting Notes:
+
+Start: 5:00 PM
+
+Project Group Attendees: 
+Isaac
+Gavin
+Kevin
+Josh
+Cody
+Aleqzander
+
+Showed sponsor the synthetic data generator, she approved
+Communicated that we have been in contact with the other teams
+Both of the teams have received some of the hardware, so they have started testing but there are still some blockers
+We are in contact with electrical and waiting for their creation of the database
+https://nasa.github.io/openmct/
+The output that we are getting is something that would be in mission control, that link may be helpful for data visualization
+
+
+
+Q: Should the other team provide the baseline/safeguard data
+A: Yes, the ones developing the sensors will be the ones to give us the hard cut lines
+Q: Does the sponsor want us to detect sensor degredation?
+A: That would be really useful. Not quite sure how we would do that but it would be very cool
+Q: Our project description said we need to determine the best way to store data, is that different than sensor team?
+A: Same database, different tables for storing the two different types of data
+Q: Could simulation data stored in database, but real time data would be telemetry sent to our model?
+A: That is an option we can do
+
+End: 5:13PM
