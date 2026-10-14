@@ -156,9 +156,9 @@ def generate_sensor(rng, sensor, base, activity, cumulative, total_s, anomalies,
     while t < total_s: #t handles any step size, better than for loop
         idx = min(int(t), len(activity) - 1) #track index for activity and cumulative list
         a = activity[idx]
-        active = [(i, an) for i, an in enumerate(anomalies) if an["start"] <= t < an["end"]]
+        active = [(i, an) for i, an in enumerate(anomalies) if an["start"] <= t < an["end"]] #find active anomalies at this time and pair with their index
 
-        if any(an["type"] == "dropout" for _, an in active):
+        if any(an["type"] == "dropout" for _, an in active): #dropout is a special case, it just skips the reading
             t += step
             continue
 
@@ -171,17 +171,18 @@ def generate_sensor(rng, sensor, base, activity, cumulative, total_s, anomalies,
                  + rng.gauss(0, noise))              # sensor jitter
 
         for i, an in active:
+            #make sure anomolies progress correctly based on their type and duration
             frac = (t - an["start"]) / (an["end"] - an["start"])
             if an["type"] == "ramp":
-                value += frac * (ramp_target - base)
+                value += frac * (ramp_target - base) #make sure the ramp is smooth and continuous - hence frac calculation
             elif an["type"] == "spike":
                 value += sign * sensor.get("spike_delta", 0.0)
             elif an["type"] == "stuck":
                 value = stuck_value.setdefault(i, value)
 
-        value = min(max(value, lim_lo), lim_hi)
+        value = min(max(value, lim_lo), lim_hi) #force reading into sensor limits
 
-        for i, an in active:
+        for i, an in active: #check for crossings with the critical threshold
             if an["type"] in ("ramp", "spike") and i not in crossings and is_critical(side, threshold, value):
                 crossings[i] = t
 
@@ -200,6 +201,7 @@ def iso(ts):
 
 
 def main():
+    #parse arguments
     ap = argparse.ArgumentParser(description="Generate synthetic suit sensor sessions.")
     ap.add_argument("--config", default=str(Path(__file__).with_name("sensors.json")))
     ap.add_argument("--out", default="synthetic_output")
@@ -209,12 +211,14 @@ def main():
     ap.add_argument("--start", default="2026-10-05T14:00:00", help="UTC start of the first session")
     args = ap.parse_args()
 
-    with open(args.config) as f:
+    with open(args.config) as f: #load config
         cfg = json.load(f)
 
     rng = random.Random(args.seed)
     # Sensors with "enabled": false (e.g. suit_pressure for unpressurized suits) are skipped.
     sensors = {k: s for k, s in cfg["sensors"].items() if s.get("enabled", True)}
+    
+    #shortcuts for later
     scfg = cfg["session"]
     overshoot = cfg["anomalies"].get("ramp_overshoot", 1.15)
 
