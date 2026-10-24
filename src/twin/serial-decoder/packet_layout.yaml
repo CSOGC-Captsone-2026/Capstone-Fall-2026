@@ -1,0 +1,44 @@
+# PROVISIONAL packet layout -- NOT the real struct.
+# Every value here is a placeholder until the Bio and Environmental teams
+# finalize the struct. When they do, we need to edit THIS file; the decoder and the
+# packer both read it, so no code changes should be needed.
+#
+# Frame on the wire:
+#   [ sync ][ header fields ][ channel fields ][ crc ]
+
+provisional: true
+layout_version: 0
+
+byte_order: little #endian
+
+sync: [0xAA, 0x55] #marks the start of each frame, used to resync
+
+crc: crc16_ccitt_false # none | crc16_ccitt_false | crc32
+
+# Types: uint8 int8 uint16 int16 uint32 int32 float32
+# Physical value = raw * scale + offset
+header:
+  - {name: seq,        type: uint16}   # wraps at 65535; used to detect lost packets
+  - {name: bio_status, type: uint8}    # bit flags (bio node OK, battery, BLE link...) -- TBD
+  - {name: env_status, type: uint8}    # bit flags (env node OK, battery, BLE link...) -- TBD
+  - {name: valid_mask, type: uint16}   # bit N = 1 means channel with valid_bit N is fresh
+
+# min/max are sanity limits: values outside them are flagged "suspect".
+# invalid_raw (optional) is a sentinel the firmware sends for "sensor fault".
+# valid_bit (optional) links the channel to a bit in valid_mask.
+channels:
+  # --- biometric (Bio team) ---
+  - {name: heart_rate,       type: uint8,  scale: 1,    unit: bpm,          min: 20,  max: 250, valid_bit: 0}
+  - {name: respiration_rate, type: uint8,  scale: 1,    unit: breaths/min,  min: 0,   max: 80,  valid_bit: 1}
+  - {name: core_temp,        type: int16,  scale: 0.01, unit: C,            min: 30,  max: 44,  valid_bit: 2, invalid_raw: 32767}
+  - {name: skin_temp,        type: int16,  scale: 0.01, unit: C,            min: 20,  max: 45,  valid_bit: 3, invalid_raw: 32767}
+  - {name: perspiration,     type: uint16, scale: 0.01, unit: uS,           min: 0,   max: 100, valid_bit: 4}
+  - {name: hydration_loss,   type: uint16, scale: 0.01, unit: "% body mass", min: 0,  max: 10,  valid_bit: 5}
+  - {name: spo2,             type: uint8,  scale: 1,    unit: "%",          min: 50,  max: 100, valid_bit: 6}
+  # --- environmental (ECEE team) ---
+  - {name: o2,               type: uint16, scale: 0.01, unit: "%",           min: 0,   max: 100,   valid_bit: 7}
+  - {name: co2,              type: uint16, scale: 1,    unit: ppm,          min: 0,   max: 50000, valid_bit: 8}
+  - {name: suit_air_temp,    type: int16,  scale: 0.01, unit: C,            min: -40, max: 85,  valid_bit: 9,  invalid_raw: 32767}
+  - {name: vent_loop_temp,   type: int16,  scale: 0.01, unit: C,            min: -40, max: 85,  valid_bit: 10, invalid_raw: 32767}
+  - {name: humidity,         type: uint16, scale: 0.01, unit: "%RH",        min: 0,   max: 100, valid_bit: 11}
+  - {name: pm2_5,            type: uint16, scale: 0.1,  unit: ug/m3,        min: 0,   max: 1000, valid_bit: 12}
