@@ -23,6 +23,7 @@ import random
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
+import sys
 
 ANOMALY_TYPES = ("ramp", "spike", "stuck", "dropout", "contextual")
 
