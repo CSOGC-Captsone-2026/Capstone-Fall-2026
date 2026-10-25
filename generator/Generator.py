@@ -192,6 +192,92 @@ def generate_sensor(rng, sensor, base, activity, cumulative, total_s, anomalies,
 
     return samples, crossings
 
+# ---------------------------------------------------------------------------
+# Optional: route readings through the serial packet encoder/decoder
+# ---------------------------------------------------------------------------
+
+DEFAULT_DECODER_DIR = Path(__file__).resolve().parent.parent / "src" / "twin" / "serial-decoder"
+
+
+def load_decoder(decoder_dir):
+    """Import decoder.py from the serial-decoder folder (needs PyYAML)."""
+    sys.path.insert(0, str(decoder_dir))
+    import decoder  # noqa: E402
+    return decoder
+
+
+def check_layout_compat(sensors, layout):
+    """Fail loudly if a generated sensor has no channel in the packet layout."""
+    channels = {c.name: c for c in layout.channels}
+    missing = [k for k in sensors if k not in channels]
+    if missing:
+        raise SystemExit(f"These sensors are not in packet_layout.yaml and would be lost: {missing}")
+    for k, s in sensors.items():
+        if channels[k].unit != s["unit"]:
+            print(f"WARNING: unit mismatch for {k}: generator '{s['unit']}' vs layout '{channels[k].unit}'",
+                  file=sys.stderr)
+    unused = [c for c in channels if c not in sensors]
+    if unused:
+        print(f"NOTE: layout channels with no generated data (sent as stale/fault): {unused}",
+              file=sys.stderr)
+
+
+def route_through_decoder(rows, layout, decoder_mod, frame_interval, seq0):
+    """
+    Pack one session's readings into binary frames with layout.encode_frame(),
+    then decode the byte stream with StreamDecoder, like the real serial link.
+
+    rows: [(t_seconds, order, sensor_id, value, unit)] for one session.
+    Each frame k covers [k*frame_interval, (k+1)*frame_interval) and carries the latest
+    value of every channel; channels with no new sample in that window are marked stale.
+
+    Returns (decoded rows in the same shape, raw frame bytes, decoder stats, next seq).
+    """
+    order = {sid: o for _t, o, sid, _v, _u in rows}
+    unit = {sid: u for _t, _o, sid, _v, u in rows}
+
+    # Group samples by frame; a later sample in the same window replaces an earlier one.
+    fresh_by_frame = {}
+    for t, _o, sid, v, _u in rows:
+        fresh_by_frame.setdefault(int(t // frame_interval), {})[sid] = v
+    n_frames = max(fresh_by_frame) + 1 if fresh_by_frame else 0
+    if n_frames >= 0x8000:
+        raise SystemExit("too many frames per session for a 16-bit seq; raise --frame-interval")
+
+    # Encode
+    last = {}
+    stream = bytearray()
+    for k in range(n_frames):
+        fresh = fresh_by_frame.get(k, {})
+        last.update(fresh)
+        values, stale = {}, []
+        for c in layout.channels:
+            if c.name in last:
+                values[c.name] = last[c.name]          # held value if not fresh
+            elif c.invalid_raw is not None:
+                values[c.name] = None                  # no data yet: fault sentinel
+            else:
+                values[c.name] = 0                     # no data yet, no sentinel: placeholder
+            if c.name not in fresh:
+                stale.append(c.name)                   # clears its valid_mask bit
+        stream += layout.encode_frame(values, seq=(seq0 + k) & 0xFFFF, stale=stale)
+
+    # Decode, in chunks like a serial port would deliver them
+    dec = decoder_mod.StreamDecoder(layout)
+    packets = []
+    for i in range(0, len(stream), 256):
+        packets += dec.feed(bytes(stream[i:i + 256]))
+
+    # Back to rows: keep only fresh readings, timestamped at the start of their frame
+    decoded = []
+    for p in packets:
+        k = (p.seq - seq0) & 0xFFFF
+        for name, r in p.readings.items():
+            if name in order and r.quality in ("ok", "suspect") and r.value is not None:
+                decoded.append((k * frame_interval, order[name], name, r.value, unit[name]))
+    decoded.sort()
+    return decoded, bytes(stream), dec.stats, (seq0 + n_frames) & 0xFFFF
+
 
 # ---------------------------------------------------------------------------
 # Main
@@ -210,6 +296,10 @@ def main():
     ap.add_argument("--subjects", type=int, default=3)
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--start", default="2026-10-05T14:00:00", help="UTC start of the first session")
+    ap.add_argument("--via-decoder", action="store_true", help="encode readings into binary frames and decode them before writing readings.csv")
+    ap.add_argument("--frame-interval", type=float, default=1.0, help="seconds per frame (with --via-decoder)")
+    ap.add_argument("--decoder-dir", default=str(DEFAULT_DECODER_DIR))
+    ap.add_argument("--layout", default=None, help="packet layout YAML (default: the decoder's own)")
     args = ap.parse_args()
 
     with open(args.config) as f: #load config
@@ -242,6 +332,14 @@ def main():
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     session_start = datetime.fromisoformat(args.start).replace(tzinfo=timezone.utc)
+    
+    if args.via_decoder:
+        decoder_mod = load_decoder(args.decoder_dir)
+        layout = decoder_mod.PacketLayout.from_yaml(args.layout or decoder_mod.DEFAULT_LAYOUT)
+        check_layout_compat(sensors, layout)
+        capture = open(out / "capture.bin", "wb")     # the raw bytes, replayable with decoder.py --file
+        seq = 0
+        totals = {"frames": 0, "bytes": 0, "crc_errors": 0, "packets_lost": 0}
 
     n_readings = 0
     with open(out / "readings.csv", "w", newline="") as rf, \
@@ -284,9 +382,23 @@ def main():
                 rw.writerow([iso(t0 + timedelta(seconds=t)), session_id, subject_id, sensor_id, v, unit])
             n_readings += len(rows)
             session_start = t0 + timedelta(seconds=total_s) + gap
+            
+            if args.via_decoder:
+                rows, frame_bytes, stats, seq = route_through_decoder(
+                    rows, layout, decoder_mod, args.frame_interval, seq)
+                capture.write(frame_bytes)
+                totals["frames"] += stats.frames_ok
+                totals["bytes"] += len(frame_bytes)
+                totals["crc_errors"] += stats.crc_errors
+                totals["packets_lost"] += stats.packets_lost
 
     print(f"Wrote {args.sessions} sessions ({n_readings:,} readings) for "
           f"{args.subjects} subjects to {out}/")
+    if args.via_decoder:
+        capture.close()
+        print(f"Decoder round trip: {totals['frames']:,} frames, {totals['bytes']:,} bytes "
+              f"({layout.frame_len}-byte frames), {totals['crc_errors']} CRC errors, "
+              f"{totals['packets_lost']} packets lost")
 
 
 if __name__ == "__main__":
