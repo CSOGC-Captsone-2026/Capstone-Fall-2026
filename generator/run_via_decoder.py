@@ -182,6 +182,62 @@ def decode_session(decoder_mod, layout, wire: bytes, seq0: int, chunk: int = 256
 # Main
 # ---------------------------------------------------------------------------
 
+def check_observability(raw_dir, decoded_path, output_path):
+    # Load the original readings
+    original = defaultdict(list)
+    with open(raw_dir / "readings.csv", newline="") as f:
+        for row in csv.DictReader(f):
+            key = (row["session_id"], row["sensor_id"])
+            original[key].append(parse_ts(row["timestamp"]))
+
+    # Load readings that survived transmission
+    decoded = defaultdict(list)
+    with open(decoded_path, newline="") as f:
+        for row in csv.DictReader(f):
+            key = (row["session_id"], row["sensor_id"])
+            decoded[key].append(parse_ts(row["timestamp"]))
+
+    # Check how many readings survived during each anomaly
+    with open(raw_dir / "labels.csv", newline="") as f:
+        labels = list(csv.DictReader(f))
+
+    for label in labels:
+        key = (label["session_id"], label["sensor_id"])
+        start = parse_ts(label["start"])
+        end = parse_ts(label["end"])
+
+        expected = sum(start <= t < end for t in original[key])
+        received = sum(start <= t < end for t in decoded[key])
+
+        coverage = received / expected if expected else 0.0
+
+        label["expected_samples"] = expected
+        label["received_samples"] = received
+        label["coverage"] = round(min(coverage, 1.0), 3)
+        label["observable"] = int(received > 0)
+
+        # Check if any readings survived after the critical threshold was crossed
+        critical_at = label["critical_at"]
+        if critical_at:
+            critical_time = parse_ts(critical_at)
+            label["post_critical_evidence"] = int(
+                any(critical_time <= t < end for t in decoded[key])
+            )
+        else:
+            label["post_critical_evidence"] = 0
+
+    fields = [
+        "session_id", "subject_id", "sensor_id",
+        "type", "start", "end", "critical_at",
+        "expected_samples", "received_samples",
+        "coverage", "observable", "post_critical_evidence"
+    ]
+
+    with open(output_path, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fields)
+        writer.writeheader()
+        writer.writerows(labels)
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="Run the generator through the serial encoder/decoder.")
     ap.add_argument("--out", default="data/via_decoder")
@@ -275,6 +331,13 @@ def main() -> None:
 
     for name in ("labels.csv", "activity.csv"):
         shutil.copy(raw_dir / name, out / name)
+
+    #Observability code
+    check_observability(
+        raw_dir,
+        out / "readings.csv",
+        out / "labels_observability.csv"
+    )
 
     summary = {
         "layout_version": layout.version,
