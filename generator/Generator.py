@@ -378,10 +378,6 @@ def main():
                                  iso(t0 + timedelta(seconds=crit)) if crit is not None else ""])
 
             rows.sort()
-            for t, _order, sensor_id, v, unit in rows:
-                rw.writerow([iso(t0 + timedelta(seconds=t)), session_id, subject_id, sensor_id, v, unit])
-            n_readings += len(rows)
-            session_start = t0 + timedelta(seconds=total_s) + gap
             
             if args.via_decoder:
                 rows, frame_bytes, stats, seq = route_through_decoder(
@@ -391,6 +387,13 @@ def main():
                 totals["bytes"] += len(frame_bytes)
                 totals["crc_errors"] += stats.crc_errors
                 totals["packets_lost"] += stats.packets_lost
+
+            #GP - moved below block to fix logic, decoder now writes to readings.csv
+            for t, _order, sensor_id, v, unit in rows:
+                rw.writerow([iso(t0 + timedelta(seconds=t)), session_id, subject_id, sensor_id, v, unit])
+
+            n_readings += len(rows)
+            session_start = t0 + timedelta(seconds=total_s) + gap
 
     print(f"Wrote {args.sessions} sessions ({n_readings:,} readings) for "
           f"{args.subjects} subjects to {out}/")
