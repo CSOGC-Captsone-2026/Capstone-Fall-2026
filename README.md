@@ -77,7 +77,7 @@ Further setup and execution instructions will be added as development progresses
 | Cody Mattox | Software Developer |
 | Gavin Petruzzi | Software Developer |
 | Joshua Wright | Software Developer |
-| Alexqzander Baker | Software Developer |
+| Aleqzander Baker | Software Developer |
 | Isaac Camacho | Software Developer |
 
 ## Project Sponsor
