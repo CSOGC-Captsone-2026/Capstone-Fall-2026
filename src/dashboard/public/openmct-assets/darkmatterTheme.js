@@ -1,0 +1,2 @@
+!function(e,t){"object"==typeof exports&&"object"==typeof module?module.exports=t():"function"==typeof define&&define.amd?define([],t):"object"==typeof exports?exports.openmct=t():e.openmct=t()}(this,()=>(()=>{"use strict";var e={};return e.default})());
+//# sourceMappingURL=darkmatterTheme.js.map

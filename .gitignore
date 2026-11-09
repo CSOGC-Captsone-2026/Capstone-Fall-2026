@@ -3,3 +3,8 @@
 __pycache__/
 *.pyc
 .venv/
+# Node dependencies
+node_modules/
+
+# Vite build output
+dist/
