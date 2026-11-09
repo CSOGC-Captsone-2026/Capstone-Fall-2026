@@ -3,8 +3,18 @@
 __pycache__/
 *.pyc
 .venv/
-# Node dependencies
+
+# Node.js dependencies
 node_modules/
 
-# Vite build output
+# Build output
 dist/
+
+# Generated Open MCT assets
+src/dashboard/public/openmct-assets/
+
+# IDE configuration
+.idea/
+
+# OS files
+.DS_Store
