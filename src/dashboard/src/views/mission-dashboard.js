@@ -14,6 +14,7 @@ export default function installMissionDashboard(openmct) {
 
         view(domainObject) {
             let container;
+            let handleSensorNavigation;
 
             function statusFor(sensor) {
                 const critical = sensor.critical || {};
@@ -40,11 +41,16 @@ export default function installMissionDashboard(openmct) {
                 return { text: "Normal", css: "good" };
             }
 
-            function sensorCard(sensor) {
+            function sensorCard(key, sensor) {
                 const status = statusFor(sensor);
 
                 return `
-                    <div class="sensor-card">
+                    <button
+                        class="sensor-card sensor-card-link"
+                        type="button"
+                        data-sensor-key="${key}"
+                        aria-label="View ${sensor.name} graph"
+                    >
                         <div class="sensor-name">${sensor.name}</div>
                         <div class="sensor-value">
                             ${sensor.value}
@@ -60,14 +66,19 @@ export default function installMissionDashboard(openmct) {
                                 ${status.text}
                             </span>
                         </div>
-                    </div>
+                        <div class="sensor-card-action">
+                            View graph <span aria-hidden="true">→</span>
+                        </div>
+                    </button>
                 `;
             }
 
             function section(title, source) {
-                const cards = Object.values(sensors)
-                    .filter(s => s.enabled && s.source === source)
-                    .map(sensorCard)
+                const cards = Object.entries(sensors)
+                    .filter(([, sensor]) =>
+                        sensor.enabled && sensor.source === source
+                    )
+                    .map(([key, sensor]) => sensorCard(key, sensor))
                     .join("");
 
                 return `
@@ -172,12 +183,41 @@ export default function installMissionDashboard(openmct) {
                     `;
 
                     element.appendChild(container);
+
+                    handleSensorNavigation = event => {
+                        const card = event.target.closest(
+                            "[data-sensor-key]"
+                        );
+
+                        if (!card || !container.contains(card)) return;
+
+                        const sensorKey = card.dataset.sensorKey;
+                        const sensor = sensors[sensorKey];
+
+                        if (!sensor?.enabled) return;
+
+                        openmct.router.navigate(
+                            `#/browse/cosgc:mission/` +
+                            `cosgc:${sensor.source}/` +
+                            `cosgc:${sensorKey}?view=plot-single`
+                        );
+                    };
+
+                    container.addEventListener(
+                        "click",
+                        handleSensorNavigation
+                    );
                 },
 
                 destroy() {
                     if (container) {
+                        container.removeEventListener(
+                            "click",
+                            handleSensorNavigation
+                        );
                         container.remove();
                         container = null;
+                        handleSensorNavigation = null;
                     }
                 }
             };

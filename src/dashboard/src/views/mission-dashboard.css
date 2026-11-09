@@ -9,6 +9,43 @@
     background: #101820;
 }
 
+.l-shell__main-view-browse-bar {
+    position: relative;
+}
+
+.dashboard-back-button {
+    position: absolute;
+    z-index: 10;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 4px 10px;
+    border: 1px solid #53616c;
+    border-radius: 3px;
+    background: #2b2b2b;
+    color: #d8dde2;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.dashboard-back-button:hover {
+    background: #343f46;
+    border-color: #74bdd5;
+    color: #ffffff;
+}
+
+.dashboard-back-button:focus-visible {
+    outline: 2px solid #8bd8f2;
+    outline-offset: 2px;
+}
+
+.dashboard-back-button[hidden] {
+    display: none;
+}
+
 .mission-header {
     display: flex;
     justify-content: space-between;
@@ -65,6 +102,29 @@
     min-width: 0;
 }
 
+.sensor-card-link {
+    width: 100%;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition:
+        background-color 120ms ease,
+        border-color 120ms ease,
+        transform 120ms ease;
+}
+
+.sensor-card-link:hover {
+    background: #233543;
+    border-color: #57829a;
+    transform: translateY(-1px);
+}
+
+.sensor-card-link:focus-visible {
+    outline: 2px solid #8bd8f2;
+    outline-offset: 2px;
+}
+
 .sensor-name {
     font-size: 13px;
     color: #aab8c5;
@@ -90,6 +150,13 @@
     gap: 8px;
     font-size: 12px;
     color: #aab8c5;
+}
+
+.sensor-card-action {
+    margin-top: 14px;
+    color: #8bd8f2;
+    font-size: 12px;
+    font-weight: bold;
 }
 
 .good {
