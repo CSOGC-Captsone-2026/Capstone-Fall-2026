@@ -1,133 +1,45 @@
-
+// Dashboard metadata mirrors generator/Sensors.JSON, the simulation source of truth.
 export const sensors = {
-    o2: {
-        name: "Oxygen",
-        source: "environmental",
-        value: 20.8,
-        unit: "%",
-        normal: [20.6, 20.95],
-        critical: { low: 19.5 },
-        rate_hz: 1,
-        enabled: true
-    },
-    co2: {
-        name: "Carbon Dioxide",
-        source: "environmental",
-        value: 0.04,
-        unit: "%",
-        normal: [0.03, 0.06],
-        critical: { high: 0.5 },
-        rate_hz: 1,
-        enabled: true
-    },
-    temperature: {
-        name: "Ambient Temperature",
-        source: "environmental",
-        value: 22,
-        unit: "°C",
-        normal: [18, 27],
-        critical: { high: 35 },
-        rate_hz: 1,
-        enabled: true
-    },
-    humidity: {
-        name: "Humidity",
-        source: "environmental",
-        value: 45,
-        unit: "%",
-        normal: [30, 60],
-        critical: { high: 80 },
-        rate_hz: 1,
-        enabled: true
-    },
-    airflow: {
-        name: "Airflow",
-        source: "environmental",
-        value: 4,
-        unit: "L/min",
-        normal: [2, 6],
-        critical: { low: 1 },
-        rate_hz: 1,
-        enabled: true
-    },
-    pressure: {
-        name: "Suit Pressure",
-        source: "environmental",
-        value: 4.3,
-        unit: "psi",
-        normal: [4.25, 4.35],
-        critical: { low: 3.8 },
-        rate_hz: 1,
-        enabled: false
-    },
-    heart_rate: {
-        name: "Heart Rate",
-        source: "biometric",
-        value: 72,
-        unit: "bpm",
-        normal: [60, 85],
-        critical: { high: 170 },
-        rate_hz: 1,
-        enabled: true
-    },
-    respiration_rate: {
-        name: "Respiration Rate",
-        source: "biometric",
-        value: 15,
-        unit: "breaths/min",
-        normal: [12, 18],
-        critical: { high: 35 },
-        rate_hz: 0.5,
-        enabled: true
-    },
-    core_temp: {
-        name: "Core Temperature",
-        source: "biometric",
-        value: 37,
-        unit: "°C",
-        normal: [36.8, 37.2],
-        critical: { high: 38.5 },
-        rate_hz: 0.1,
-        enabled: true
-    },
-    skin_temp: {
-        name: "Skin Temperature",
-        source: "biometric",
-        value: 33.4,
-        unit: "°C",
-        normal: [32.5, 34],
-        critical: { high: 37 },
-        rate_hz: 0.2,
-        enabled: true
-    },
-    perspiration: {
-        name: "Perspiration",
-        source: "biometric",
-        value: 4.5,
-        unit: "µS",
-        normal: [2, 8],
-        critical: { high: 30 },
-        rate_hz: 1,
-        enabled: true
-    },
-    hydration_loss: {
-        name: "Hydration Loss",
-        source: "biometric",
-        value: 0.05,
-        unit: "% body mass",
-        normal: [0, 0.1],
-        critical: { high: 2 },
-        rate_hz: 0.0167,
-        enabled: true
-    },
-    spo2: {
-        name: "Blood Oxygen (SpO2)",
-        source: "biometric",
-        value: 98,
-        unit: "%",
-        normal: [96, 99],
-        critical: { low: 92 },
-        rate_hz: 1,
-        enabled: true
-    }
+    o2: sensor("Oxygen", "environmental", 20.8, "%", 1,
+        [20.6, 20.95], { low: 19.5 }),
+    co2: sensor("Carbon Dioxide", "environmental", 900, "ppm", 1,
+        [600, 1200], { high: 5000 }),
+    suit_air_temp: sensor("Suit Air Temperature", "environmental", 23,
+        "C", 0.2, [21, 25], { high: 35 }),
+    vent_loop_temp: sensor("Vent Loop Temperature", "environmental", 20,
+        "C", 0.2, [18, 22], { high: 30 }),
+    humidity: sensor("Humidity", "environmental", 42, "%RH", 0.2,
+        [35, 50], { high: 85 }),
+    pm2_5: sensor("Particulates (PM2.5)", "environmental", 5, "ug/m3",
+        0.5, [2, 8], { high: 35 }),
+    suit_pressure: sensor("Suit Pressure", "environmental", 4.3, "psi", 1,
+        [4.25, 4.35], { low: 3.8 }, false),
+    heart_rate: sensor("Heart Rate", "biometric", 72, "bpm", 1,
+        [60, 85], { high: 170 }),
+    respiration_rate: sensor("Respiration Rate", "biometric", 15,
+        "breaths/min", 0.5, [12, 18], { high: 35 }),
+    core_temp: sensor("Core Temperature", "biometric", 37, "C", 0.1,
+        [36.8, 37.2], { high: 38.5 }),
+    skin_temp: sensor("Skin Temperature", "biometric", 33.4, "C", 0.2,
+        [32.5, 34], { high: 37 }),
+    perspiration: sensor("Perspiration", "biometric", 4.5, "uS", 1,
+        [2, 8], { high: 30 }),
+    hydration_loss: sensor("Hydration Loss", "biometric", 0.05,
+        "% body mass", 0.0167, [0, 0.1], { high: 2 }),
+    spo2: sensor("Blood Oxygen (SpO2)", "biometric", 98, "%", 1,
+        [96, 99], { low: 92 })
 };
+
+function sensor(name, source, value, unit, rate_hz, normal, critical,
+    enabled = true) {
+    return {
+        name,
+        source,
+        value,
+        unit,
+        rate_hz,
+        normal,
+        critical,
+        enabled
+    };
+}

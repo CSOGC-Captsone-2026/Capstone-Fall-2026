@@ -59,8 +59,6 @@ export default function installObjectProvider(openmct) {
                         name: sensor.name,
                         unit: sensor.unit,
                         format: "float",
-                        min: sensor.normal[0],
-                        max: sensor.normal[1],
                         hints: { range: 1 }
                     },
                     {
