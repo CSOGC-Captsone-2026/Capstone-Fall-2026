@@ -1,0 +1,8 @@
+pyyaml
+pyserial
+pytest
+fastapi
+uvicorn[standard]
+pandas
+pyarrow
+psycopg[binary] 

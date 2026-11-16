@@ -1,8 +1,13 @@
 {
-    "name": "Capstone Dev Environment",
-    "build": {
-        "dockerfile": "Dockerfile"
-    },
+    "name": "CSOGC Dev Environment",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "dev",
     "workspaceFolder": "/workspace",
-    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind"
+    "remoteUser": "ubuntu",
+    "forwardPorts": [8000],
+    "customizations": {
+        "vscode": {
+            "extensions": ["ms-python.python", "charliermarsh.ruff"]
+        }
+    }
 }

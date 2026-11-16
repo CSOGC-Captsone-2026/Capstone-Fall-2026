@@ -1,0 +1,31 @@
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - .:/workspace:cached
+    command: sleep infinity
+    ports:
+      - "8000:8000"
+    environment: # change these to real values in a .env 
+      DB_HOST: db
+      DB_NAME: twin
+      DB_USER: postgres
+      DB_PASSWORD: devpassword
+    depends_on:
+      - db
+
+  db:
+    image: timescale/timescaledb:latest-pg16
+    environment:
+      POSTGRES_PASSWORD: devpassword
+      POSTGRES_DB: twin
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./infra/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+volumes:
+  pgdata:

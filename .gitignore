@@ -1,20 +1,38 @@
 /data/
 
+# Secrets and local config
+.env
+.env.*
+!.env.example
+
+# Python
 __pycache__/
 *.pyc
 .venv/
-
-# Node.js dependencies
-node_modules/
-
-# Build output
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
 dist/
 
 # Generated Open MCT assets
 src/dashboard/public/openmct-assets/
 
-# IDE configuration
-.idea/
+# Node / dashboard
+node_modules/
 
-# OS files
+# Data (large, generated, or sensitive)
+data/raw/
+data/simulated/
+data/curated/
+*.bin
+*.parquet
+models/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Editor / OS
+.vscode/*
+!.vscode/extensions.json
 .DS_Store
+Thumbs.db
