@@ -49,6 +49,31 @@ the Python process to begin a new simulated mission.
 
 To stop either process, press `Ctrl+C` in its terminal.
 
+### Plot detail and missing readings
+
+Sensor plots reduce display detail without changing the simulation or its
+stored history. Historical plot requests use Open MCT's min/max strategy and
+point limit; both historical and live plots display the mean of readings in
+each five-second timestamp interval. This smooths sensor noise and reduces
+visual clutter without modifying raw readings on the simulation server. Short
+spikes can be softened by averaging; the demo's configured anomalies last
+minutes. At `--speed 10`, a sensor configured for 1 Hz can produce ten
+simulated readings per real second.
+
+Open MCT connects numeric readings with straight lines by default. It does not
+create new telemetry samples, but a line between two readings is a visual
+interpolation. A simulated `dropout` skips readings; the plot may connect the
+readings on either side, so that line alone does not distinguish a dropout
+from a gradual change.
+
+The dashboard's live stream sends JSON readings directly; this path does not
+simulate packet encoding or packet loss. If the browser disconnects, missed
+live events are not replayed, though available server history can be requested
+when the graph loads. A slow stream client can also overflow its 1,000-reading
+queue; the current server drops readings in that case without marking the gap.
+The separate `generator/run_via_decoder.py` tool simulates packet encoding,
+decoding, and link loss.
+
 ### Simulation options
 
 ```text
