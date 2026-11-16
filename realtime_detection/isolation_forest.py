@@ -1,20 +1,13 @@
-
+import argparse
 from pathlib import Path
 
 import pandas as pd
 from sklearn.ensemble import IsolationForest
 
-DATA_PATH = (
-    Path(__file__).resolve().parent.parent
-    / "generator"
-    / "data"
-    / "original"
-    / "readings.csv"
-)
+REPO = Path(__file__).resolve().parent.parent
 
 
-def evaluate_model(results):
-    labels_path = DATA_PATH.parent / "labels.csv"
+def evaluate_model(results, labels_path):
     labels = pd.read_csv(labels_path)
 
     labels["start"] = pd.to_datetime(labels["start"], utc=True)
@@ -54,8 +47,8 @@ def evaluate_model(results):
     print(f"Precision: {precision:.2f}")
     print(f"Recall: {recall:.2f}")
 
-def load_data():
-    return pd.read_csv(DATA_PATH)
+def load_data(folder):
+    return pd.read_csv(Path(folder) / "readings.csv")
 
 def prepare_data(df):
     #Convert individual sensor readings into feature columns
@@ -83,35 +76,47 @@ def train_model(features):
     return model
 
 if __name__ == "__main__":
-    data = load_data()
-    features = prepare_data(data)
+    parser = argparse.ArgumentParser(description="Train on one dataset, test on another.")
+    parser.add_argument("--train", default=str(REPO / "data" / "train"),
+                        help="folder with readings.csv used for training")
+    parser.add_argument("--test", default=str(REPO / "data" / "test"),
+                        help="folder with readings.csv and labels.csv used for testing")
+    args = parser.parse_args()
 
-    print(f"Total sensor readings: {len(data)}")
-    print(f"Prepared observations: {len(features)}")
-    print(f"Sensor features: {len(features.columns)}")
+    train_data = load_data(args.train)
+    test_data = load_data(args.test)
+    train_features = prepare_data(train_data)
+    test_features = prepare_data(test_data)
 
-    if features.empty:
-        raise ValueError("No complete observations available for training.")
+    print(f"Training readings: {len(train_data)} -> {len(train_features)} observations")
+    print(f"Test readings:     {len(test_data)} -> {len(test_features)} observations")
+    print(f"Sensor features: {len(train_features.columns)}")
 
-    #Train the isolation forest model
-    model = train_model(features)
+    if train_features.empty or test_features.empty:
+        raise ValueError("No complete observations available for training or testing.")
 
-    #predict anomalies in the prepared data
-    predictions = model.predict(features)
+    #Both sets must have the same sensor columns in the same order
+    test_features = test_features[train_features.columns]
+
+    #Train the isolation forest model on the training set only
+    model = train_model(train_features)
+
+    #predict anomalies in the test set (data the model has never seen)
+    predictions = model.predict(test_features)
 
     normal_count = (predictions == 1).sum()
     anomaly_count = (predictions == -1).sum()
 
-    print("\nIsolation Forest Results:")
+    print("\nIsolation Forest Results (test set):")
     print(f"Normal observations: {normal_count}")
     print(f"Flagged anomalies: {anomaly_count}")
     print(f"Anomaly percentage: {anomaly_count / len(predictions) * 100:.2f}%")
 
     #Show the timestamps
-    results = features.copy()
+    results = test_features.copy()
     results["anomaly"] = predictions
 
     print("\nFirst 10 flagged anomalies:")
     print(results[results["anomaly"] == -1].head(10))
 
-    evaluate_model(results)
+    evaluate_model(results, Path(args.test) / "labels.csv")
